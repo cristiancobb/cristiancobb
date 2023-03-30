@@ -1,0 +1,31 @@
+SELECT p.product_name, s.store_name, s.city, SUM(o.quantity * o.unit_price) as total_sales
+FROM orders o
+JOIN products p ON o.product_id = p.product_id
+JOIN stores s ON o.store_id = s.store_id
+WHERE o.order_date BETWEEN '2022-01-01' AND '2022-03-31'
+AND s.country = 'USA'
+GROUP BY p.product_name, s.store_name, s.city
+HAVING total_sales > (
+    SELECT AVG(total_sales)
+    FROM (
+        SELECT p.product_name, s.store_name, SUM(o.quantity * o.unit_price) as total_sales
+        FROM orders o
+        JOIN products p ON o.product_id = p.product_id
+        JOIN stores s ON o.store_id = s.store_id
+        WHERE o.order_date BETWEEN '2022-01-01' AND '2022-03-31'
+        AND s.country = 'USA'
+        GROUP BY p.product_name, s.store_name
+    ) as sales_per_store
+)
+ORDER BY total_sales DESC;
+
+/*
+This script retrieves information about the total sales of each product in each store in the USA between
+January 1, 2022, and March 31, 2022. It uses JOIN statements to link the orders, products, and stores tables
+together. It also includes a WHERE clause to filter the results by country and date range, a GROUP BY clause 
+to group the results by product, store, and city, and a SUM function to calculate the total sales.
+
+The script also includes a subquery that calculates the average sales per store, and a HAVING clause that
+filters the results to only show stores with total sales above the average. Finally, the results are sorted
+in descending order by total sales.
+*/
