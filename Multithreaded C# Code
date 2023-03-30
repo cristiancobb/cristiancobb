@@ -1,0 +1,83 @@
+using System;
+using System.IO;
+using System.Threading;
+
+class MatrixMultiplication
+{
+    static int[,] A, B, C;
+    static int N = 1000, M = 1000, P = 1000;
+
+    static void Main()
+    {
+        // Initialize matrices
+        A = new int[N, M];
+        B = new int[M, P];
+        C = new int[N, P];
+        Random rand = new Random();
+        for (int i = 0; i < N; i++)
+        {
+            for (int j = 0; j < M; j++)
+            {
+                A[i, j] = rand.Next(10);
+            }
+        }
+        for (int i = 0; i < M; i++)
+        {
+            for (int j = 0; j < P; j++)
+            {
+                B[i, j] = rand.Next(10);
+            }
+        }
+
+        // Perform matrix multiplication using multiple threads
+        int numThreads = Environment.ProcessorCount;
+        Thread[] threads = new Thread[numThreads];
+        for (int t = 0; t < numThreads; t++)
+        {
+            threads[t] = new Thread(new ParameterizedThreadStart(Multiply));
+            threads[t].Start(t);
+        }
+        foreach (Thread thread in threads)
+        {
+            thread.Join();
+        }
+
+        // Write the result to a file
+        StreamWriter writer = new StreamWriter("result.txt");
+        for (int i = 0; i < N; i++)
+        {
+            for (int j = 0; j < P; j++)
+            {
+                writer.Write(C[i, j] + " ");
+            }
+            writer.WriteLine();
+        }
+        writer.Close();
+    }
+
+    static void Multiply(object threadNum)
+    {
+        int startRow = ((int)threadNum * N) / Environment.ProcessorCount;
+        int endRow = (((int)threadNum + 1) * N) / Environment.ProcessorCount;
+        for (int i = startRow; i < endRow; i++)
+        {
+            for (int j = 0; j < P; j++)
+            {
+                for (int k = 0; k < M; k++)
+                {
+                    C[i, j] += A[i, k] * B[k, j];
+                }
+            }
+        }
+    }
+}
+
+/*
+Implements a multithreaded program that generates a random matrix, performs matrix multiplication, 
+and writes the result to a file:
+This program generates two random matrices of size 1000x1000, performs matrix multiplication using 
+multiple threads (one thread per CPU core), and writes the result to a file. The matrix multiplication
+is split into multiple threads to take advantage of multicore processors and improve performance. 
+The Multiply method is called by each thread, and it multiplies a portion of the matrices and updates
+the result matrix C. Finally, the result matrix is written to a file using the StreamWriter class.
+*/
