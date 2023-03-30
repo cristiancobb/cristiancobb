@@ -69,3 +69,11 @@ def play_game():
     
 # Start the game
 play_game()
+
+
+"""This program defines a deck of cards and their values, and then simulates a game of Blackjack. The program deals two cards each to the player and dealer, 
+and then prompts the player to hit or stand. The program then simulates the dealer's turn according to the standard rules of Blackjack. The program then 
+determines the winner of the game based on the scores of the player and dealer.
+
+This code uses a variety of Python features, including lists, dictionaries, loops, functions, and conditional statements. It also uses the random module to 
+shuffle the deck of cards and deal random cards to the player and dealer."""
