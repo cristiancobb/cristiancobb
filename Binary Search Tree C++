@@ -1,0 +1,117 @@
+#include <iostream>
+using namespace std;
+
+struct Node {
+    int data;
+    Node* left;
+    Node* right;
+};
+
+class BST {
+    private:
+        Node* root;
+        Node* insert(int data, Node* root) {
+            if (root == nullptr) {
+                Node* newNode = new Node;
+                newNode->data = data;
+                newNode->left = nullptr;
+                newNode->right = nullptr;
+                return newNode;
+            }
+            if (data < root->data) {
+                root->left = insert(data, root->left);
+            } else {
+                root->right = insert(data, root->right);
+            }
+            return root;
+        }
+
+        Node* findMin(Node* root) {
+            while (root->left != nullptr) {
+                root = root->left;
+            }
+            return root;
+        }
+
+        Node* deleteNode(int data, Node* root) {
+            if (root == nullptr) {
+                return root;
+            } else if (data < root->data) {
+                root->left = deleteNode(data, root->left);
+            } else if (data > root->data) {
+                root->right = deleteNode(data, root->right);
+            } else {
+                // Case 1: No child
+                if (root->left == nullptr && root->right == nullptr) {
+                    delete root;
+                    root = nullptr;
+                }
+                // Case 2: One child
+                else if (root->left == nullptr) {
+                    Node* temp = root;
+                    root = root->right;
+                    delete temp;
+                } else if (root->right == nullptr) {
+                    Node* temp = root;
+                    root = root->left;
+                    delete temp;
+                }
+                // Case 3: Two children
+                else {
+                    Node* temp = findMin(root->right);
+                    root->data = temp->data;
+                    root->right = deleteNode(temp->data, root->right);
+                }
+            }
+            return root;
+        }
+
+        void inorderTraversal(Node* root) {
+            if (root == nullptr) {
+                return;
+            }
+            inorderTraversal(root->left);
+            cout << root->data << " ";
+            inorderTraversal(root->right);
+        }
+
+    public:
+        BST() {
+            root = nullptr;
+        }
+
+        void insert(int data) {
+            root = insert(data, root);
+        }
+
+        void deleteNode(int data) {
+            root = deleteNode(data, root);
+        }
+
+        void inorderTraversal() {
+            inorderTraversal(root);
+        }
+};
+
+int main() {
+    BST bst;
+    bst.insert(50);
+    bst.insert(30);
+    bst.insert(20);
+    bst.insert(40);
+    bst.insert(70);
+    bst.insert(60);
+    bst.insert(80);
+    bst.inorderTraversal(); // Output: 20 30 40 50 60 70 80
+    bst.deleteNode(20);
+    bst.deleteNode(30);
+    bst.inorderTraversal(); // Output: 40 50 60 70 80
+    return 0;
+}
+
+/*
+This program defines a struct Node to represent nodes in the binary search tree and a class BST to 
+represent the tree itself. The BST class includes methods to insert, delete, and traverse nodes in the tree. 
+The main function creates a binary search tree, inserts some values, and then performs some deletion operations 
+on the tree before traversing it again.
+*/
